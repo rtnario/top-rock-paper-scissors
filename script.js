@@ -12,34 +12,49 @@ function playRound(playerSelection, computerSelection) {
     if (loseToIndex > 2) { loseToIndex %= 3 }
 
     if (computerIndex === beatsIndex) {
-        return `You Win! ${playerSelection} beats ${computerSelection}`;
+        return [`You Win! ${playerSelection} beats ${computerSelection}`, 1];
     }
 
     else if (computerIndex === loseToIndex) {
-        return `You Lose! ${computerSelection} beats ${playerSelection}`;
+        return [`You Lose! ${computerSelection} beats ${playerSelection}`, 2];
     }
 
-    return `It's a draw! Both players chose ${computerSelection}!`;
+    return [`It's a draw! Both players chose ${computerSelection}!`, 0];
 }
 
 function game() {
-    for (let i = 0; i < 5; i++) {
-        let playerSelection = "";
-        let validChoice = false;
+    const output = document.querySelector('#game-output');
+    const score = document.querySelector('#score');
+    const btns = document.querySelectorAll('button');
+    const question = document.createElement('p');
+    question.textContent = "Rock, Paper, or Scissors?";
+    output.prepend(question);
 
-        while (!validChoice) {
-            playerSelection = prompt("Rock, Paper, or Scissors?");
-            playerSelection = playerSelection.toLowerCase();
-            playerSelection = playerSelection.charAt(0).toUpperCase() +
-                              playerSelection.slice(1);
+    let playerScore = 0;
+    let computerScore = 0;
+    let playerSelection = "";
 
-            if (options.includes(playerSelection)) { validChoice = true }
-            else { alert("Invalid selection!") }
+    btns.forEach(btn => btn.addEventListener('click', (e) => {
+        playerSelection = e.target.id.slice(4);
+        playerSelection = playerSelection.charAt(0).toUpperCase() + playerSelection.slice(1);
+        let computerSelection = computerPlay();
+
+        const result = document.createElement('p');
+        const resultArr = playRound(playerSelection, computerSelection);
+        result.textContent = resultArr[0];
+        output.prepend(result);
+
+        if (resultArr[1] === 1) { score.textContent = `Player: ${++playerScore} | Computer: ${computerScore}`}
+        else if (resultArr[1] === 2) { score.textContent = `Player: ${playerScore} | Computer: ${++computerScore}`}
+
+        if (playerScore === 5) {
+            alert("Congratulations! You've won the game!");
         }
 
-        let computerSelection = computerPlay();
-        console.log(playRound(playerSelection, computerSelection));
-    }
+        else if (computerScore === 5) {
+            alert("You've lost the game, better luck next time!");
+        }
+    }));
 }
 
 game();
